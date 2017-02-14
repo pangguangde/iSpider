@@ -1,0 +1,9 @@
+pytz
+scrapy
+scrapyd
+scrapyd-client
+peewee
+lxml
+attrs
+pyasn1-modules
+cryptography
