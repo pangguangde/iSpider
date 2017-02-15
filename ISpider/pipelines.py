@@ -5,6 +5,7 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import datetime
+import json
 
 from ISpider.util.DBManager import get_db
 
@@ -17,7 +18,10 @@ class ISpiderPipeline():
             with self.db.atomic():
                 try:
                     model = type(obj)()
-                    model.get(id=obj.id)
+                    record = model.get(id=obj.id)
+                    rec_rank = json.loads(record.ranking)
+                    rec_rank.update(json.loads(obj.ranking))
+                    obj.ranking = json.dumps(rec_rank)
                     obj.save()
                     spider.logger.info('pipeline : mysql %s : {id: %s}' % ('update', obj.id))
                 except:
