@@ -110,8 +110,7 @@ if IS_DEV:
 
 else:
     PROJECT_DIR = '/home/souche/projects/ISpider'
-
-    MYSQL_HOST = '10.168.114.140'
+    MYSQL_HOST = '127.0.0.1'
     MYSQL_PORT = 3306
     MYSQL_USER = 'souche'
     MYSQL_PASSWORD = 'AqIy2xz9zdNnYt575ywe'

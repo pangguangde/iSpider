@@ -1,3 +1,4 @@
+MySQLdb
 requests
 pytz
 scrapy

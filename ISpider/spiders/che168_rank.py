@@ -326,34 +326,36 @@ class Che168Rank(CrawlSpider):
         self.mode = mode[self.category or 'city']
 
     def start_requests(self):
-        if self.category == 'series':
-            for city in crawling_cities:
-                for series in crawling_series:
-                    url_prefix = 'https://appsapi.che168.com/Phone/V57/cars/search.ashx?_appid=2scapp.ios&appversion=5.5.9&channelid=App Store&cid=%s&cpcnum=4&dealertype=9&ispic=0&orderby=0&pagesize=%s&pid=%s&seriesid=%s&brandid=%s&_sign=cda602a1e47e463968fdbe03a58f04a3' % (city['city_id'], PAGE_SIZE, city['province_id'], series['series_id'], series['brand_id'])
-                    yield Request('%s&pageindex=1' % url_prefix, meta={'url_prefix': url_prefix, 'type': 'get_total', 'page': 1, 'city_name': city['name']}, dont_filter=True)
-        elif self.category == 'price':
-            for city in crawling_cities:
-                for price in crawling_price:
-                    url_prefix = 'https://appsapi.che168.com/Phone/V57/cars/search.ashx?_appid=2scapp.ios&appversion=5.5.9&channelid=App Store&cid=%s&cpcnum=4&dealertype=9&ispic=0&orderby=0&pagesize=%s&pid=%s&priceregion=%s&_sign=cda602a1e47e463968fdbe03a58f04a3' % (city['city_id'], PAGE_SIZE, city['province_id'], price)
-                    yield Request('%s&pageindex=1' % url_prefix,meta={'url_prefix': url_prefix, 'type': 'get_total', 'page': 1, 'city_name': city['name']}, dont_filter=True)
-        else:
-            for city in crawling_cities:
-                url_prefix = 'https://appsapi.che168.com/Phone/V57/cars/search.ashx?_appid=2scapp.ios&appversion=5.5.9&channelid=App Store&cid=%s&cpcnum=4&dealertype=9&ispic=0&orderby=0&pagesize=%s&pid=%s&_sign=cda602a1e47e463968fdbe03a58f04a3' % (city['city_id'], PAGE_SIZE, city['province_id'])
-                yield Request('%s&pageindex=1' % url_prefix, meta={'url_prefix': url_prefix, 'type': 'get_total', 'page': 1, 'city_name': city['name']}, dont_filter=True)
+        for page in range(1, 6):
+            if self.category == 'series':
+                for city in crawling_cities:
+                    for series in crawling_series:
+                        url_prefix = 'https://appsapi.che168.com/Phone/V57/cars/search.ashx?_appid=2scapp.ios&appversion=5.5.9&channelid=App Store&cid=%s&cpcnum=4&dealertype=9&ispic=0&orderby=0&pagesize=%s&pid=%s&seriesid=%s&brandid=%s&_sign=cda602a1e47e463968fdbe03a58f04a3' % (city['city_id'], PAGE_SIZE, city['province_id'], series['series_id'], series['brand_id'])
+                        yield Request('%s&pageindex=%s' % (url_prefix, page), meta={'url_prefix': url_prefix, 'type': 'get_cars_info', 'page': page, 'city_name': city['name']}, dont_filter=True)
+            elif self.category == 'price':
+                for city in crawling_cities:
+                    for price in crawling_price:
+                        url_prefix = 'https://appsapi.che168.com/Phone/V57/cars/search.ashx?_appid=2scapp.ios&appversion=5.5.9&channelid=App Store&cid=%s&cpcnum=4&dealertype=9&ispic=0&orderby=0&pagesize=%s&pid=%s&priceregion=%s&_sign=cda602a1e47e463968fdbe03a58f04a3' % (city['city_id'], PAGE_SIZE, city['province_id'], price)
+                        yield Request('%s&pageindex=%s' % (url_prefix, page), meta={'url_prefix': url_prefix, 'type': 'get_cars_info', 'page': page, 'city_name': city['name']}, dont_filter=True)
+            else:
+                for city in crawling_cities:
+                    url_prefix = 'https://appsapi.che168.com/Phone/V57/cars/search.ashx?_appid=2scapp.ios&appversion=5.5.9&channelid=App Store&cid=%s&cpcnum=4&dealertype=9&ispic=0&orderby=0&pagesize=%s&pid=%s&_sign=cda602a1e47e463968fdbe03a58f04a3' % (city['city_id'], PAGE_SIZE, city['province_id'])
+                    yield Request('%s&pageindex=%s' % (url_prefix, page), meta={'url_prefix': url_prefix, 'type': 'get_cars_info', 'page': page, 'city_name': city['name']}, dont_filter=True)
 
     def parse(self, response):
         if response.meta['type'] == 'get_total':
-            try:
-                data = json.loads(response.body_as_unicode())
-            except Exception, e:
-                print e
-            total = data['result']['rowcount']
-            pages = (total / 10  + 1) / PAGE_SIZE + 1
-            if pages > 1:
-                for page in range(1, pages + 1):
-                    yield Request('%s&pageindex=%s' % (response.meta['url_prefix'], page), meta={'type': 'get_cars_info', 'page': page, 'city_name': response.meta['city_name']}, dont_filter=True)
-            else:
-                self.parse_cars_info(response)
+            pass
+            # try:
+            #     data = json.loads(response.body_as_unicode())
+            # except Exception, e:
+            #     print e
+            # total = data['result']['rowcount']
+            # pages = (total / 10  + 1) / PAGE_SIZE + 1
+            # if pages > 1:
+            #     for page in range(1, pages + 1):
+            #         yield Request('%s&pageindex=%s' % (response.meta['url_prefix'], page), meta={'type': 'get_cars_info', 'page': page, 'city_name': response.meta['city_name']}, dont_filter=True)
+            # else:
+            #     self.parse_cars_info(response)
         else:
             for item in self.parse_cars_info(response):
                 yield item
@@ -364,19 +366,21 @@ class Che168Rank(CrawlSpider):
         except Exception, e:
             print e
         car_list = data['result']['carlist']
-        for i in range(PAGE_SIZE):
-            car_info = car_list[i]
-            ri = RankInfo()
-            ri.site = 'che168'
-            ri.city = response.meta['city_name']
-            ri.mode = self.mode
-            ri.car_id = str(car_info['carid'])
-            ri.id = '%s_%s_%s' % (ri.site, ri.car_id, ri.mode)
-            ri.ranking = json.dumps({int(time.time()): i + 1 + (response.meta['page'] - 1) * PAGE_SIZE})  # cause ranking start from 1 while list indices start from 0
-            mi = ModelItem()
-            mi['model'] = [ri]
-            yield mi
+        page_size = len(car_list)
+        if page_size:
+            for i in range(page_size):
+                car_info = car_list[i]
+                ri = RankInfo()
+                ri.site = 'che168'
+                ri.city = response.meta['city_name']
+                ri.mode = self.mode
+                ri.car_id = str(car_info['carid'])
+                ri.id = '%s_%s_%s' % (ri.site, ri.car_id, ri.mode)
+                ri.ranking = json.dumps({int(time.time()): i + 1 + (response.meta['page'] - 1) * PAGE_SIZE})  # cause ranking start from 1 while list indices start from 0
+                mi = ModelItem()
+                mi['model'] = [ri]
+                yield mi
 
 
 if __name__ == '__main__':
-    execute('scrapy crawl che168_rank'.split(' '))
+    execute('scrapy crawl che168_rank -a category=series'.split(' '))
