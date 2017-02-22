@@ -2,14 +2,10 @@ build/
 eggs/
 logs/
 dbs/
-dbs/NewsSpider.db
 .idea/
 *.pyc
-*.db
 *.pid
 project.egg-info/
-twistd.pid
-dbs/NewsSpider/
-logs/script_logs/
-TestEnv/
 items/
+ISpider/spiders/weibo.py
+ISpider/test.py
