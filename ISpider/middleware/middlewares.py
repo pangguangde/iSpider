@@ -8,7 +8,7 @@ class UserAgentMiddleware(object):
 
     def process_request(self, request, spider):
         ua = get_random_ua()
-        if ua:
+        if not ua:
             request.headers['User-Agent'] = ua
 
     def process_exception(self, request, exception, spider):

@@ -12,19 +12,33 @@ from ISpider.resource.crawling_params import CRAWLING_CITIES, CRAWLING_SERIES, C
 
 __author__ = 'guangde'
 
-
 mode = {
-    'city': 1,
+    'city'  : 1,
     'series': 2,
-    'price': 3,
+    'price' : 3,
 }
-
 
 PAGE_SIZE = 24
 
+
 class Che168Rank(CrawlSpider):
     name = 'che168_rank'
-
+    custom_settings = {
+        'REDIRECT_ENABLED'      : False,
+        'CONCURRENT_REQUESTS'   : 10,
+        'DOWNLOAD_TIMEOUT'      : 10,
+        'RETRY_TIMES'           : 50,
+        'ITEM_PIPELINES'        : {
+            'ISpider.pipelines.ISpiderRankInfoPipeline': 300,
+        },
+        'DOWNLOADER_MIDDLEWARES': {
+            'ISpider.middleware.middlewares.RemoveCookieMiddleware'     : 690,
+            'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 750,
+            'ISpider.middleware.middlewares.UserAgentMiddleware'        : 730,
+            'ISpider.middleware.middlewares.RandomProxyMiddleware'      : 745,
+        }
+    }
+    
     def __init__(self, category=None, *args, **kwargs):
         """
 
@@ -36,24 +50,33 @@ class Che168Rank(CrawlSpider):
         super(Che168Rank, self).__init__(*args, **kwargs)
         self.category = category
         self.mode = mode[self.category or 'city']
-
+    
     def start_requests(self):
         for page in range(1, 6):
             if self.category == 'series':
                 for city in CRAWLING_CITIES:
                     for series in CRAWLING_SERIES:
-                        url_prefix = 'https://appsapi.che168.com/Phone/V57/cars/search.ashx?_appid=2scapp.ios&appversion=5.5.9&channelid=App Store&cid=%s&cpcnum=4&dealertype=9&ispic=0&orderby=0&pagesize=%s&pid=%s&seriesid=%s&brandid=%s&_sign=cda602a1e47e463968fdbe03a58f04a3' % (city['city_id'], PAGE_SIZE, city['province_id'], series['series_id'], series['brand_id'])
-                        yield Request('%s&pageindex=%s' % (url_prefix, page), meta={'url_prefix': url_prefix, 'type': 'get_cars_info', 'page': page, 'city_name': city['name']}, dont_filter=True)
+                        url_prefix = 'https://appsapi.che168.com/Phone/V57/cars/search.ashx?_appid=2scapp.ios&appversion=5.5.9&channelid=App Store&cid=%s&cpcnum=4&dealertype=9&ispic=0&orderby=0&pagesize=%s&pid=%s&seriesid=%s&brandid=%s&_sign=cda602a1e47e463968fdbe03a58f04a3' % (
+                        city['city_id'], PAGE_SIZE, city['province_id'], series['series_id'], series['brand_id'])
+                        yield Request('%s&pageindex=%s' % (url_prefix, page),
+                                      meta={'url_prefix': url_prefix, 'type': 'get_cars_info', 'page': page,
+                                            'city_name' : city['name']}, dont_filter=True)
             elif self.category == 'price':
                 for city in CRAWLING_CITIES:
                     for price in CRAWLING_PRICE:
-                        url_prefix = 'https://appsapi.che168.com/Phone/V57/cars/search.ashx?_appid=2scapp.ios&appversion=5.5.9&channelid=App Store&cid=%s&cpcnum=4&dealertype=9&ispic=0&orderby=0&pagesize=%s&pid=%s&priceregion=%s&_sign=cda602a1e47e463968fdbe03a58f04a3' % (city['city_id'], PAGE_SIZE, city['province_id'], price)
-                        yield Request('%s&pageindex=%s' % (url_prefix, page), meta={'url_prefix': url_prefix, 'type': 'get_cars_info', 'page': page, 'city_name': city['name']}, dont_filter=True)
+                        url_prefix = 'https://appsapi.che168.com/Phone/V57/cars/search.ashx?_appid=2scapp.ios&appversion=5.5.9&channelid=App Store&cid=%s&cpcnum=4&dealertype=9&ispic=0&orderby=0&pagesize=%s&pid=%s&priceregion=%s&_sign=cda602a1e47e463968fdbe03a58f04a3' % (
+                        city['city_id'], PAGE_SIZE, city['province_id'], price)
+                        yield Request('%s&pageindex=%s' % (url_prefix, page),
+                                      meta={'url_prefix': url_prefix, 'type': 'get_cars_info', 'page': page,
+                                            'city_name' : city['name']}, dont_filter=True)
             else:
                 for city in CRAWLING_CITIES:
-                    url_prefix = 'https://appsapi.che168.com/Phone/V57/cars/search.ashx?_appid=2scapp.ios&appversion=5.5.9&channelid=App Store&cid=%s&cpcnum=4&dealertype=9&ispic=0&orderby=0&pagesize=%s&pid=%s&_sign=cda602a1e47e463968fdbe03a58f04a3' % (city['city_id'], PAGE_SIZE, city['province_id'])
-                    yield Request('%s&pageindex=%s' % (url_prefix, page), meta={'url_prefix': url_prefix, 'type': 'get_cars_info', 'page': page, 'city_name': city['name']}, dont_filter=True)
-
+                    url_prefix = 'https://appsapi.che168.com/Phone/V57/cars/search.ashx?_appid=2scapp.ios&appversion=5.5.9&channelid=App Store&cid=%s&cpcnum=4&dealertype=9&ispic=0&orderby=0&pagesize=%s&pid=%s&_sign=cda602a1e47e463968fdbe03a58f04a3' % (
+                    city['city_id'], PAGE_SIZE, city['province_id'])
+                    yield Request('%s&pageindex=%s' % (url_prefix, page),
+                                  meta={'url_prefix': url_prefix, 'type': 'get_cars_info', 'page': page,
+                                        'city_name' : city['name']}, dont_filter=True)
+    
     def parse(self, response):
         if response.meta['type'] == 'get_total':
             pass
@@ -71,7 +94,7 @@ class Che168Rank(CrawlSpider):
         else:
             for item in self.parse_cars_info(response):
                 yield item
-
+    
     def parse_cars_info(self, response):
         try:
             data = json.loads(response.body_as_unicode())
@@ -88,7 +111,8 @@ class Che168Rank(CrawlSpider):
                 ri.mode = self.mode
                 ri.car_id = str(car_info['carid'])
                 ri.id = '%s_%s_%s' % (ri.site, ri.car_id, ri.mode)
-                ri.ranking = json.dumps({int(time.time()): i + 1 + (response.meta['page'] - 1) * PAGE_SIZE})  # cause ranking start from 1 while list indices start from 0
+                ri.ranking = json.dumps({int(time.time()): i + 1 + (response.meta[
+                                                                        'page'] - 1) * PAGE_SIZE})  # cause ranking start from 1 while list indices start from 0
                 mi = ModelItem()
                 mi['model'] = [ri]
                 yield mi
