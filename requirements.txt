@@ -14,7 +14,6 @@ bdist-mpkg==0.5.0
 BeautifulSoup==3.2.1
 beautifulsoup4==4.5.1
 billiard==3.3.0.23
-bonjour-py==0.3
 bosonnlp==0.7.0
 bs4==0.0.1
 celery==3.1.23
