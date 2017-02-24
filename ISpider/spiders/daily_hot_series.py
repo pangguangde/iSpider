@@ -21,7 +21,7 @@ __author__ = 'guangde'
 
 
 class Che168DailyHotSeries(CrawlSpider):
-    name = 'che168_daily_hot_series'
+    name = 'daily_hot_series'
     
     custom_settings = {
         'REDIRECT_ENABLED'      : False,
@@ -94,4 +94,4 @@ class Che168DailyHotSeries(CrawlSpider):
 
 
 if __name__ == '__main__':
-    execute('scrapy crawl che168_daily_hot_series'.split(' '))
+    execute('scrapy crawl daily_hot_series'.split(' '))
