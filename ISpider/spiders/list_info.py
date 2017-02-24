@@ -66,7 +66,7 @@ class Che168ListInfo(CrawlSpider):
         li.city = response.meta.get('city_name')
         if response.meta.get('price'):
             li.price = response.meta.get('price')
-        li.id = self.stringUtil.md5_encode('%s_%s_%s' % (li.city, (li.series or li.price or 'None'), datetime.datetime.now().strftime('%Y-%m-%d %H:00:00')))
+        li.id = self.stringUtil.md5_encode(u'%s_%s_%s' % (li.city, (li.series or li.price or 'None').decode('utf8'), datetime.datetime.now().strftime('%Y-%m-%d %H:00:00')))
         li.query_mode = response.meta['mode']
         li.total_count = total
         li.page_count = data['result']['pagecount']

@@ -1,5 +1,5 @@
 requests
 pytz
-Crypto
 peewee
 scrapy
+pycrypto
