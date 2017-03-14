@@ -71,4 +71,5 @@ if __name__ == '__main__':
     # print get_che168_udid()
     print decode_3des('C/tHzFGCpFKy/pTflxfmHMua98hzCq3QfgZ+oaNoz/zWNGLEe0I0YE4lsxhcSzVJqoX7uZtDVRKYDWnj46Eg73dEh5vL6S0y')
     print decode_3des('C/tHzFGCpFKy/pTflxfmHMua98hzCq3QfgZ+oaNoz/zWNGLEe0I0YJpvVfE+78EdUSQL+XNorStMhjEuJb+AlKiT83yL9p18')
+    print encode_md5('123456')
     # print encode_md5( u'中国')
