@@ -3,6 +3,7 @@ import json
 
 import time
 
+import logging
 from scrapy import FormRequest
 from scrapy import Request
 from scrapy.cmdline import execute
@@ -259,6 +260,7 @@ class VINTest(CrawlSpider):
                     self.status[vin_code] = 0
         self.fp = None
         self.mode = mode[self.category or 'city']
+        # self.logger = logging.getLogger()
     
     def start_requests(self):
         for vin_code in self.vin_list:
@@ -271,17 +273,17 @@ class VINTest(CrawlSpider):
         try:
             data = json.loads(response.body_as_unicode())
         except Exception, e:
-            print e
+            self.logger.error(e)
         if data['code'] == 'S1':
             out_s = '%s\t%s\n' % (response.meta['vin_code'], data['message']['levelIds'])
-            print out_s.strip()
+            self.logger.info(out_s.strip())
             self.fp = open('%s/out.txt' % RESOURCE_DIR, 'a+')
             self.fp.write(out_s)
             self.fp.close()
             # del self.vin_list[0]
             yield None
         elif data['code'] == 'S0':
-            print 'wrong code: %s' % response.meta['vin_code']
+            self.logger.info('wrong code: %s' % response.meta['vin_code'])
             # del self.vin_list[0]
             yield None
         elif data['code'] == 'E1':
