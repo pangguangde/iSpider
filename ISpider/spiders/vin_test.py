@@ -61,7 +61,8 @@ class VINTest(CrawlSpider):
                     secret = item[1]
                     self.vin_list.append((vin_code, secret))
         else:
-            self.conn = MySQLdb.connect(host='115.29.10.121', port=3306, user='root', passwd='dpjA8Z6XPXbvos', db='starscream', charset='utf8')
+            self.conn = MySQLdb.connect(host=MYSQL_HOST, port=MYSQL_PORT, user=MYSQL_USER, passwd=MYSQL_PASSWORD,
+                                        db=MYSQL_DB, charset='utf8')
             cur = self.conn.cursor()
             cur.execute('select vin_code from vin_tmp where status=0')
             result = cur.fetchall()
@@ -178,5 +179,5 @@ def get_year_by_vin(vin_code):
     return 2010 + temp if 2010 + temp < 2017 else 2010 - (30 - temp)
 
 if __name__ == '__main__':
-    execute('scrapy crawl vin_test -a category=detail'.split(' '))
+    execute('scrapy crawl vin_test'.split(' '))
     # print get_year_by_vin('LEPM4ACC1D1A38907')
