@@ -33,7 +33,7 @@ class VINTest(CrawlSpider):
     custom_settings = {
         'REDIRECT_ENABLED'      : False,
         'CONCURRENT_REQUESTS'   : 5,
-        # 'DOWNLOAD_DELAY'   : 1,
+        'DOWNLOAD_DELAY'   : 1,
         'DOWNLOAD_TIMEOUT'      : 10,
         'RETRY_TIMES'           : 50,
         'ITEM_PIPELINES'        : {
