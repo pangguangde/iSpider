@@ -32,7 +32,7 @@ class VINTest(CrawlSpider):
     name = 'vin_test'
     custom_settings = {
         'REDIRECT_ENABLED'      : False,
-        'CONCURRENT_REQUESTS'   : 25,
+        'CONCURRENT_REQUESTS'   : 5,
         # 'DOWNLOAD_DELAY'   : 1,
         'DOWNLOAD_TIMEOUT'      : 10,
         'RETRY_TIMES'           : 50,
