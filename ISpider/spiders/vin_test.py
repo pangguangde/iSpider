@@ -52,7 +52,7 @@ class VINTest(CrawlSpider):
         self.category = category
         self.vin_list = []
         if self.category:
-            with open('%s/detail.csv' % RESOURCE_DIR, 'w+') as f:
+            with open('%s/detail.csv' % RESOURCE_DIR, 'a+') as f:
                 f.write('sub_VIN,VIN,Secret,厂家,品牌,车型,VIN年份,排放标准,进气形式,排量(升),最大马力(ps),驱动形式,变速器描述,档位数,燃油类型\n')
             with open('%s/vin-secret.txt' % RESOURCE_DIR, 'r+') as f:
                 for line in f:
