@@ -14,7 +14,7 @@ from scrapy.spiders import CrawlSpider
 from ISpider.item.ModelItem import ModelItem
 from ISpider.model.che168_ranke import RankInfo
 from ISpider.resource.crawling_params import CRAWLING_CITIES, CRAWLING_SERIES, CRAWLING_PRICE
-from ISpider.settings import RESOURCE_DIR
+from ISpider.settings import *
 
 __author__ = 'guangde'
 
@@ -99,8 +99,8 @@ class VINTest(CrawlSpider):
                 self.fp.write(out_s)
                 self.fp.close()
                 # del self.vin_list[0]
-                self.conn = MySQLdb.connect(host='115.29.10.121', port=3306, user='root', passwd='dpjA8Z6XPXbvos',
-                                            db='starscream', charset='utf8')
+                self.conn = MySQLdb.connect(host=MYSQL_HOST, port=MYSQL_PORT, user=MYSQL_USER, passwd=MYSQL_PASSWORD,
+                                            db=MYSQL_DB, charset='utf8')
                 cur = self.conn.cursor()
                 cur.execute('update vin_tmp set status=1 where vin_code="%s"' % response.meta['vin_code'])
                 self.conn.commit()
@@ -109,8 +109,8 @@ class VINTest(CrawlSpider):
                 yield None
             elif data['code'] == 'S0':
                 self.logger.info('wrong code: %s' % response.meta['vin_code'])
-                self.conn = MySQLdb.connect(host='115.29.10.121', port=3306, user='root', passwd='dpjA8Z6XPXbvos',
-                                            db='starscream', charset='utf8')
+                self.conn = MySQLdb.connect(host=MYSQL_HOST, port=MYSQL_PORT, user=MYSQL_USER, passwd=MYSQL_PASSWORD,
+                                            db=MYSQL_DB, charset='utf8')
                 cur = self.conn.cursor()
                 cur.execute('update vin_tmp set status=-1 where vin_code="%s"' % response.meta['vin_code'])
                 self.conn.commit()
