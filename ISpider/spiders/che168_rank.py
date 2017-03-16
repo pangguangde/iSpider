@@ -2,6 +2,8 @@
 import json
 
 import time
+from urllib import urlencode
+
 from scrapy import Request
 from scrapy.cmdline import execute
 from scrapy.spiders import CrawlSpider
@@ -9,6 +11,7 @@ from scrapy.spiders import CrawlSpider
 from ISpider.item.ModelItem import ModelItem
 from ISpider.model.che168_ranke import RankInfo
 from ISpider.resource.crawling_params import CRAWLING_CITIES, CRAWLING_SERIES, CRAWLING_PRICE
+from ISpider.util.Che168EncodingHelper import generate_che168_sign, get_che168_udid
 
 __author__ = 'guangde'
 
@@ -56,24 +59,69 @@ class Che168Rank(CrawlSpider):
             if self.category == 'series':
                 for city in CRAWLING_CITIES:
                     for series in CRAWLING_SERIES:
-                        url_prefix = 'https://appsapi.che168.com/Phone/V57/cars/search.ashx?_appid=2scapp.ios&appversion=5.5.9&channelid=App Store&cid=%s&cpcnum=4&dealertype=9&ispic=0&orderby=0&pagesize=%s&pid=%s&seriesid=%s&brandid=%s&_sign=cda602a1e47e463968fdbe03a58f04a3' % (
-                        city['city_id'], PAGE_SIZE, city['province_id'], series['series_id'], series['brand_id'])
-                        yield Request('%s&pageindex=%s' % (url_prefix, page),
+                        data = {'_appid': '2scapp.ios',
+                                'appversion': '5.6.1',
+                                'channelid': 'App Store',
+                                'cid': city['city_id'],
+                                # 'cpcnum': '4',
+                                'dealertype': '9',
+                                'udid': get_che168_udid(),
+                                'ispic': '0',
+                                'isloan': '0',
+                                'needaroundtype': '0',
+                                'orderby': '0',
+                                'pageindex': page,
+                                'pagesize': PAGE_SIZE,
+                                'pid': city['province_id'],
+                                'seriesid': series['series_id'],
+                                'brandid': series['brand_id']}
+                        url_prefix = 'https://appsapi.che168.com/Phone/V57/cars/search.ashx?%s&_sign=%s' % \
+                                     (urlencode(data), generate_che168_sign(data))
+                        yield Request(url_prefix,
                                       meta={'url_prefix': url_prefix, 'type': 'get_cars_info', 'page': page,
                                             'city_name' : city['name']}, dont_filter=True)
             elif self.category == 'price':
                 for city in CRAWLING_CITIES:
                     for price in CRAWLING_PRICE:
-                        url_prefix = 'https://appsapi.che168.com/Phone/V57/cars/search.ashx?_appid=2scapp.ios&appversion=5.5.9&channelid=App Store&cid=%s&cpcnum=4&dealertype=9&ispic=0&orderby=0&pagesize=%s&pid=%s&priceregion=%s&_sign=cda602a1e47e463968fdbe03a58f04a3' % (
-                        city['city_id'], PAGE_SIZE, city['province_id'], price)
-                        yield Request('%s&pageindex=%s' % (url_prefix, page),
+                        data = {'_appid'        : '2scapp.ios',
+                                'appversion'    : '5.6.1',
+                                'channelid'     : 'App Store',
+                                'cid'           : city['city_id'],
+                                'cpcnum'        : '0',
+                                'dealertype'    : '9',
+                                'udid'          : get_che168_udid(),
+                                'ispic'         : '0',
+                                # 'isloan'        : '0',
+                                # 'needaroundtype': '0',
+                                'orderby'       : '0',
+                                'pageindex'     : page,
+                                'pagesize'      : PAGE_SIZE,
+                                'pid'           : city['province_id'],
+                                'priceregion'   : price}
+                        url_prefix = 'https://appsapi.che168.com/Phone/V57/cars/search.ashx?%s&_sign=%s' % \
+                                     (urlencode(data), generate_che168_sign(data))
+                        yield Request(url_prefix,
                                       meta={'url_prefix': url_prefix, 'type': 'get_cars_info', 'page': page,
                                             'city_name' : city['name']}, dont_filter=True)
             else:
                 for city in CRAWLING_CITIES:
-                    url_prefix = 'https://appsapi.che168.com/Phone/V57/cars/search.ashx?_appid=2scapp.ios&appversion=5.5.9&channelid=App Store&cid=%s&cpcnum=4&dealertype=9&ispic=0&orderby=0&pagesize=%s&pid=%s&_sign=cda602a1e47e463968fdbe03a58f04a3' % (
-                    city['city_id'], PAGE_SIZE, city['province_id'])
-                    yield Request('%s&pageindex=%s' % (url_prefix, page),
+                    data = {'_appid'     : '2scapp.ios',
+                            'appversion' : '5.6.1',
+                            'channelid'  : 'App Store',
+                            'cid'        : city['city_id'],
+                            'cpcnum'     : '0',
+                            'dealertype' : '9',
+                            'udid'       : get_che168_udid(),
+                            'ispic'      : '0',
+                            # 'isloan'        : '0',
+                            # 'needaroundtype': '0',
+                            'orderby'    : '0',
+                            'pageindex'  : page,
+                            'pagesize'   : PAGE_SIZE,
+                            'pid'        : city['province_id']}
+                    url_prefix = 'https://appsapi.che168.com/Phone/V57/cars/search.ashx?%s&_sign=%s' % \
+                                 (urlencode(data), generate_che168_sign(data))
+                    yield Request(url_prefix,
                                   meta={'url_prefix': url_prefix, 'type': 'get_cars_info', 'page': page,
                                         'city_name' : city['name']}, dont_filter=True)
     
@@ -119,4 +167,4 @@ class Che168Rank(CrawlSpider):
 
 
 if __name__ == '__main__':
-    execute('scrapy crawl che168_rank -a category=series'.split(' '))
+    execute('scrapy crawl che168_rank'.split(' '))

@@ -60,16 +60,26 @@ def get_che168_udid():
 if __name__ == '__main__':
     data = {
         "_appid": "2scapp.ios",
-        "appversion": "5.6.0",
+        "appversion": "5.6.1",
         "channelid" : "App Store",
-        "cid": "330200",
+        "cid": "330100",
+        "cpcnum": "0",
+        "dealertype": "9",
+        "isloan": "0",
+        "ispic": "0",
+        "orderby": "0",
+        "pageindex": "1",
+        "pagesize": "24",
+        "priceregion": "5-10",
         "pid": "330000",
-        "udid": encode_3des('b80099a6eefa49bd8ad6c932acbb6185ebcdfdf5|1487842134.693190|25221648'),
+        # "udid": encode_3des('b80099a6eefa49bd8ad6c932acbb6185ebcdfdf5|1487842134.693190|25221648'),
+        "udid": 'C/tHzFGCpFKy/pTflxfmHMua98hzCq3QfgZ+oaNoz/zWNGLEe0I0YC5s86Vg6OaKNZoeG+Y5Hr8NFz7cH1vzfkHR4f5DWHJ+',
     }
-    # print generate_che168_sign(data) == '28d12efeb153d73b0062330adb2b10d1'
+    print generate_che168_sign(data) == '4b54f862fe1d09dfc8c5859f09ec3bec'
     # print random_hex_str(40)
     # print get_che168_udid()
     print decode_3des('C/tHzFGCpFKy/pTflxfmHMua98hzCq3QfgZ+oaNoz/zWNGLEe0I0YE4lsxhcSzVJqoX7uZtDVRKYDWnj46Eg73dEh5vL6S0y')
     print decode_3des('C/tHzFGCpFKy/pTflxfmHMua98hzCq3QfgZ+oaNoz/zWNGLEe0I0YJpvVfE+78EdUSQL+XNorStMhjEuJb+AlKiT83yL9p18')
-    print encode_md5('123456')
+    print get_che168_udid()
+    # print encode_md5('123456')
     # print encode_md5( u'中国')
